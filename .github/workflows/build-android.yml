@@ -1,33 +1,70 @@
 name: Build APK Android
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Récupération du dépôt
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Installation de Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+          cache: npm
+          cache-dependency-path: quetes-app/package-lock.json
+
+      # Installation des dépendances
+      - name: Installer les dépendances
+        working-directory: quetes-app
+        run: npm install
+
+      # Création du fichier .env
       - name: Créer le fichier .env
+        working-directory: quetes-app
         run: |
-          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
+          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" > .env
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
-      - run: npm run build
-      - run: npx cap sync android
-      - uses: actions/setup-java@v4
+
+      # Compilation Vite
+      - name: Build Web
+        working-directory: quetes-app
+        run: npm run build
+
+      # Synchronisation Capacitor
+      - name: Capacitor Sync
+        working-directory: quetes-app
+        run: npx cap sync android
+
+      # Installation de Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
-      - run: chmod +x android/gradlew
-      - working-directory: android
+          distribution: temurin
+          java-version: 21
+
+      # Donner les droits à gradlew
+      - name: Rendre gradlew exécutable
+        working-directory: quetes-app/android
+        run: chmod +x gradlew
+
+      # Construction de l'APK
+      - name: Build APK
+        working-directory: quetes-app/android
         run: ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v4
+
+      # Publication de l'APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: quetes-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: quetes-app/android/app/build/outputs/apk/debug/app-debug.apk
