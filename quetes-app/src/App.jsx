@@ -2,9 +2,14 @@ import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useGame } from './context/GameContext';
 import AuthScreen from './components/AuthScreen';
+import Onboarding from './components/Onboarding';
 import StatBar from './components/StatBar';
+import TabBar from './components/TabBar';
 import TaskColumn from './components/TaskColumn';
 import NewTaskModal from './components/NewTaskModal';
+import Dashboard from './components/Dashboard';
+import Suggestions from './components/Suggestions';
+import Profile from './components/Profile';
 import Toast from './components/Toast';
 
 export default function App() {
@@ -28,10 +33,13 @@ function GameScreen({ onSignOut }) {
     toggleDaily,
     completeTodo,
     buyReward,
+    toggleChecklistItem,
   } = useGame();
   const [modalType, setModalType] = useState(null);
+  const [tab, setTab] = useState('tasks');
 
   if (loading || !player) return <SplashScreen />;
+  if (!player.onboarded) return <Onboarding />;
 
   const byType = (type) => tasks.filter((t) => t.type === type);
 
@@ -43,50 +51,59 @@ function GameScreen({ onSignOut }) {
   };
 
   return (
-    <div className="min-h-full pb-16">
-      <StatBar player={player} onSignOut={onSignOut} />
+    <div className="min-h-full pb-24">
+      <StatBar player={player} />
 
-      <main className="max-w-3xl mx-auto px-4 py-6 space-y-8">
-        <TaskColumn
-          title="Habitudes"
-          type="habit"
-          tasks={byType('habit')}
-          onAdd={() => setModalType('habit')}
-          onAction={handleAction}
-          onDelete={deleteTask}
-        />
-        <TaskColumn
-          title="Quotidiennes"
-          type="daily"
-          tasks={byType('daily')}
-          onAdd={() => setModalType('daily')}
-          onAction={handleAction}
-          onDelete={deleteTask}
-        />
-        <TaskColumn
-          title="À faire"
-          type="todo"
-          tasks={byType('todo')}
-          onAdd={() => setModalType('todo')}
-          onAction={handleAction}
-          onDelete={deleteTask}
-        />
-        <TaskColumn
-          title="Récompenses"
-          type="reward"
-          tasks={byType('reward')}
-          onAdd={() => setModalType('reward')}
-          onAction={handleAction}
-          onDelete={deleteTask}
-        />
+      <main className="max-w-3xl mx-auto px-4 py-6">
+        {tab === 'tasks' && (
+          <div className="space-y-8">
+            <TaskColumn
+              title="Habitudes"
+              type="habit"
+              tasks={byType('habit')}
+              onAdd={() => setModalType('habit')}
+              onAction={handleAction}
+              onDelete={deleteTask}
+              onToggleChecklistItem={toggleChecklistItem}
+            />
+            <TaskColumn
+              title="Quotidiennes"
+              type="daily"
+              tasks={byType('daily')}
+              onAdd={() => setModalType('daily')}
+              onAction={handleAction}
+              onDelete={deleteTask}
+              onToggleChecklistItem={toggleChecklistItem}
+            />
+            <TaskColumn
+              title="À faire"
+              type="todo"
+              tasks={byType('todo')}
+              onAdd={() => setModalType('todo')}
+              onAction={handleAction}
+              onDelete={deleteTask}
+              onToggleChecklistItem={toggleChecklistItem}
+            />
+            <TaskColumn
+              title="Récompenses"
+              type="reward"
+              tasks={byType('reward')}
+              onAdd={() => setModalType('reward')}
+              onAction={handleAction}
+              onDelete={deleteTask}
+            />
+          </div>
+        )}
+
+        {tab === 'dashboard' && <Dashboard />}
+        {tab === 'suggestions' && <Suggestions />}
+        {tab === 'profile' && <Profile onSignOut={onSignOut} />}
       </main>
 
+      <TabBar active={tab} onChange={setTab} />
+
       {modalType && (
-        <NewTaskModal
-          type={modalType}
-          onClose={() => setModalType(null)}
-          onCreate={addTask}
-        />
+        <NewTaskModal type={modalType} onClose={() => setModalType(null)} onCreate={addTask} />
       )}
 
       <Toast toast={toast} onDismiss={dismissToast} />

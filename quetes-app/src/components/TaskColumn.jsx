@@ -7,7 +7,7 @@ const EMPTY_COPY = {
   reward: "Aucune récompense créée. Ajoute quelque chose qui te ferait plaisir.",
 };
 
-export default function TaskColumn({ title, type, tasks, onAdd, onAction, onDelete }) {
+export default function TaskColumn({ title, type, tasks, onAdd, onAction, onDelete, onToggleChecklistItem }) {
   return (
     <section>
       <div className="flex items-center justify-between mb-2.5">
@@ -31,6 +31,7 @@ export default function TaskColumn({ title, type, tasks, onAdd, onAction, onDele
               task={task}
               onAction={(action) => onAction(task, action)}
               onDelete={() => onDelete(task.id)}
+              onToggleChecklistItem={(idx) => onToggleChecklistItem(task, idx)}
             />
           ))}
         </div>
