@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+@theme {
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Manrope', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-ink: #0F0B24;
+  --color-void: #14102B;
+  --color-surface: #1E1840;
+  --color-surface-2: #291F52;
+  --color-hairline: #3A2E6E;
+  --color-parchment: #EDE6D6;
+  --color-parchment-dim: #B9AF9A;
+  --color-gold: #E3B54E;
+  --color-gold-dim: #9A7A2E;
+  --color-vitality: #3FCB93;
+  --color-wound: #E85C5C;
+  --color-arcane: #7C6CE0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-void);
+  background-image:
+    radial-gradient(ellipse at top, rgba(124, 108, 224, 0.14), transparent 55%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 12px);
+  color: var(--color-parchment);
+  font-family: var(--font-body);
+}
+
+.font-display { font-family: var(--font-display); }
+.font-mono-num { font-family: var(--font-mono); }
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-hairline); border-radius: 4px; }
+
+@keyframes seal-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(227, 181, 78, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(227, 181, 78, 0); }
+}
+.seal-pulse { animation: seal-pulse 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .seal-pulse { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
